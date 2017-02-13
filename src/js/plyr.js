@@ -52,7 +52,7 @@
             displayDuration: true,
             loadSprite: true,
             iconPrefix: 'plyr',
-            iconUrl: '../../dist/plyr.svg',
+            iconUrl: 'https://cdn.plyr.io/2.0.10/plyr.svg',
             clickToPlay: true,
             hideControls: true,
             showPosterOnEnd: false,
@@ -991,7 +991,7 @@
 
                 if (inArray(config.controls, 'quality')) {
                     qualityMenuItem = '<li role="tab">',
-                        '<button type="button" class="plyr__control plyr__control--forward" id="plyr-settings-{id}-quality-toggle" aria-haspopup="true" aria-controls="plyr-settings-{id}-quality" aria-expanded="false">',
+                        '<button type="button" class="plyr__control plyr__control--forward" id="plyr-settings-{id}-quality-toggle" aria-haspopup="true" aria-controls="plyr-🌊s-{id}-quality" aria-expanded="false">',
                             config.i18n.quality +
                             '<span class="plyr__menu__value">Auto</span>',
                         '</button>',
@@ -1000,7 +1000,7 @@
                 html.push(
                     '<div class="plyr__menu" data-plyr="settings">',
                         '<button type="button" id="plyr-settings-toggle-{id}" class="plyr__control" aria-haspopup="true" aria-controls="plyr-settings-{id}" aria-expanded="false">',
-                            '<svg><use xlink:href="' + iconPath + '-settings" /></svg>',
+                            '<svg><use xlink:href="' + iconPath + '-play" /></svg>',
                             '<span class="plyr__sr-only">' + config.i18n.settings + '</span>',
                         '</button>',
                         '<div class="plyr__menu__container" id="plyr-settings-{id}" aria-hidden="true" aria-labelled-by="plyr-settings-toggle-{id}" role="tablist" tabindex="-1">',
