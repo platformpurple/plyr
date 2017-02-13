@@ -52,7 +52,7 @@
             displayDuration: true,
             loadSprite: true,
             iconPrefix: 'plyr',
-            iconUrl: 'https://cdn.plyr.io/2.0.10/plyr.svg',
+            iconUrl: '../../dist/plyr.svg',
             clickToPlay: true,
             hideControls: true,
             showPosterOnEnd: false,
