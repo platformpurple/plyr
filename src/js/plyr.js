@@ -978,6 +978,25 @@
             // Settings button / menu
             if (inArray(config.controls, 'settings')) {
                 /* beautify ignore:start */
+                var captionsMenuItem = '',
+                qualityMenuItem = '';
+                if (inArray(config.controls, 'captions')) {
+                    captionsMenuItem = '<li role="tab">',
+                        '<button type="button" class="plyr__control plyr__control--forward" id="plyr-settings-{id}-captions-toggle" aria-haspopup="true" aria-controls="plyr-settings-{id}-captions" aria-expanded="false">',
+                            config.i18n.captions +
+                            '<span class="plyr__menu__value">{lang}</span>',
+                        '</button>',
+                    '</li>';
+                }
+
+                if (inArray(config.controls, 'quality')) {
+                    qualityMenuItem = '<li role="tab">',
+                        '<button type="button" class="plyr__control plyr__control--forward" id="plyr-settings-{id}-quality-toggle" aria-haspopup="true" aria-controls="plyr-settings-{id}-quality" aria-expanded="false">',
+                            config.i18n.quality +
+                            '<span class="plyr__menu__value">Auto</span>',
+                        '</button>',
+                    '</li>';
+                }
                 html.push(
                     '<div class="plyr__menu" data-plyr="settings">',
                         '<button type="button" id="plyr-settings-toggle-{id}" class="plyr__control" aria-haspopup="true" aria-controls="plyr-settings-{id}" aria-expanded="false">',
@@ -988,24 +1007,14 @@
                             '<div>',
                                 '<div class="plyr__menu__primary" id="plyr-settings-{id}-primary" aria-hidden="false" aria-labelled-by="plyr-settings-toggle-{id}" role="tabpanel" tabindex="-1">',
                                     '<ul>',
-                                        '<li role="tab">',
-                                            '<button type="button" class="plyr__control plyr__control--forward" id="plyr-settings-{id}-captions-toggle" aria-haspopup="true" aria-controls="plyr-settings-{id}-captions" aria-expanded="false">',
-                                                config.i18n.captions +
-                                                '<span class="plyr__menu__value">{lang}</span>',
-                                            '</button>',
-                                        '</li>',
+                                    captionsMenuItem,
                                         '<li role="tab">',
                                             '<button type="button" class="plyr__control plyr__control--forward" id="plyr-settings-{id}-speed-toggle" aria-haspopup="true" aria-controls="plyr-settings-{id}-speed" aria-expanded="false">',
                                                 config.i18n.speed +
                                                 '<span class="plyr__menu__value" data-menu="speed">{speed}</span>',
                                             '</button>',
                                         '</li>',
-                                        '<li role="tab">',
-                                            '<button type="button" class="plyr__control plyr__control--forward" id="plyr-settings-{id}-quality-toggle" aria-haspopup="true" aria-controls="plyr-settings-{id}-quality" aria-expanded="false">',
-                                                config.i18n.quality +
-                                                '<span class="plyr__menu__value">Auto</span>',
-                                            '</button>',
-                                        '</li>',
+                                        qualityMenuItem,
                                         '<li role="tab">',
                                             '<button type="button" class="plyr__control plyr__control--forward" id="plyr-settings-{id}-loop-toggle" aria-haspopup="true" aria-controls="plyr-settings-{id}-loop" aria-expanded="false">',
                                             config.i18n.loop +
