@@ -40,6 +40,11 @@
             loop: false,
             loopin: 0,
             loopout: null,
+            loopKeyEvents: {
+               toggleLoop:  76,
+               loopin:      73,
+               loopout:     79
+            },
             seekTime: 10,
             volume: 10,
             volumeMin: 0,
@@ -2469,7 +2474,7 @@
 
         // Toggle loop
         function toggleLoop(toggle) {
-            if (['loopin', 'loopout', 'loopall'].indexOf(toggle) === -1) {
+            if (['loopin', 'loopout', 'loopall', 'toggle'].indexOf(toggle) === -1) {
                 toggle = 'loopclear';
             }
 
@@ -2491,6 +2496,15 @@
               case 'loopall':
                 config.loopin = 0;
                 config.loopout = plyr.media.duration - 2;
+                break;
+              case 'toggle':
+                if (config.loop) {
+                  config.loopin = 0;
+                  config.loopout = null;
+                } else {
+                  config.loopin = 0;
+                  config.loopout = plyr.media.duration - 2;
+                }
                 break;
               default:
                 config.loopin = 0;
@@ -3544,7 +3558,7 @@
                     }
 
                     // If the code is found prevent default (e.g. prevent scrolling for arrows)
-                    if (inArray(preventDefault, code)) {
+                    if (inArray(preventDefault, code) || inArray(Object.values(config.loopKeyEvents), code)) {
                         event.preventDefault();
                         event.stopPropagation();
                     }
@@ -3583,7 +3597,6 @@
                             // Arrow down
                             decreaseVolume();
                             break;
-
                         case 77:
                             // M key
                             if (!held) {
@@ -3605,13 +3618,36 @@
                             // F key
                             toggleFullscreen();
                             break;
-
                         case 67:
                             // C key
                             if (!held) {
                                 toggleCaptions();
                             }
                             break;
+                    }
+
+                    //Loop events
+                    var loopKeyBindings = config.loopKeyEvents;
+                    var loopKeysValues = Object.values(config.loopKeyEvents);
+                    var hasBindedKey = loopKeysValues.filter(function(el) {
+                       return preventDefault.indexOf(el) > -1;
+                    }).length >= 1;
+
+                    if (hasBindedKey) {
+                      loopKeyBindings = defaults.loopKeyEvents;
+                    }
+                    console.log(loopKeyBindings,'~~~loopKeyBindings')
+
+                    switch (code) {
+                        case loopKeyBindings.toggleLoop:
+                          toggleLoop('toggle');
+                          break;
+                        case loopKeyBindings.loopin:
+                          toggleLoop('loopin');
+                          break;
+                        case loopKeyBindings.loopout:
+                          toggleLoop('loopout');
+                          break;
                     }
 
                     // Escape is handle natively when in full screen
