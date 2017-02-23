@@ -68,6 +68,7 @@
                 focused: true,
                 global: false
             },
+            tracks: [],
             tooltips: {
                 controls: false,
                 seek: true
@@ -91,12 +92,14 @@
                     forward: '[data-plyr="fast-forward"]',
                     mute: '[data-plyr="mute"]',
                     captions: '[data-plyr="captions"]',
+                    captions_menu: '[data-plyr="captions_menu"]',
                     fullscreen: '[data-plyr="fullscreen"]',
                     settings: '[data-plyr="settings"]',
                     pip: '[data-plyr="pip"]',
                     airplay: '[data-plyr="airplay"]',
                     speed: '[data-plyr="speed"]',
-                    loop: '[data-plyr="loop"]'
+                    loop: '[data-plyr="loop"]',
+                    captionslang: '[data-plyr="captionslang"]'
                 },
                 volume: {
                     input: '[data-plyr="volume"]',
@@ -213,7 +216,8 @@
                 captions: null,
                 fullscreen: null,
                 speed: null,
-                loop: null
+                loop: null,
+                captionslang: null
             },
             // Events to watch on HTML5 media elements
             events: ['ready', 'ended', 'progress', 'stalled', 'playing', 'waiting', 'canplay', 'canplaythrough', 'loadstart', 'loadeddata', 'loadedmetadata', 'timeupdate', 'volumechange', 'play', 'pause', 'error', 'seeking', 'seeked', 'emptied'],
@@ -990,14 +994,15 @@
             // Settings button / menu
             if (inArray(config.controls, 'settings')) {
                 /* beautify ignore:start */
-                var captionsMenuItem = '',
-                qualityMenuItem = '';
+                var captionsMenuItem = '';
+                var qualityMenuItem = '';
+                var trackSubs = '';
                 if (inArray(config.controls, 'captions')) {
-                    captionsMenuItem = '<li role="tab">',
-                        '<button type="button" class="plyr__control plyr__control--forward" id="plyr-settings-{id}-captions-toggle" aria-haspopup="true" aria-controls="plyr-settings-{id}-captions" aria-expanded="false">',
+                    captionsMenuItem = '<li role="tab">'+
+                        '<button type="button" class="plyr__control plyr__control--forward" id="plyr-settings-{id}-captions-toggle" aria-haspopup="true" aria-controls="plyr-settings-{id}-captions" aria-expanded="false">'+
                             config.i18n.captions +
-                            '<span class="plyr__menu__value">{lang}</span>',
-                        '</button>',
+                            '<span class="plyr__menu__value" data-captions="settings">{lang}</span>'+
+                        '</button>'+
                     '</li>';
                 }
 
@@ -1009,6 +1014,15 @@
                         '</button>',
                     '</li>';
                 }
+
+                if (Array.isArray(config.tracks) && config.tracks.length > 0) {
+                    for (var i in config.tracks) {
+                        var track = config.tracks[i];
+                        trackSubs += '<li><button type="button" class="plyr__control" data-plyr="captionslang" data-lang="'+track.srclang+'" data-index="'+i+'">'+track.label+'</button></li>';
+                    }
+
+                }
+
                 html.push(
                     '<div class="plyr__menu" data-plyr="settings">',
                         '<button type="button" id="plyr-settings-toggle-{id}" class="plyr__control" aria-haspopup="true" aria-controls="plyr-settings-{id}" aria-expanded="false">',
@@ -1019,7 +1033,7 @@
                             '<div>',
                                 '<div id="plyr-settings-{id}-primary" aria-hidden="false" aria-labelled-by="plyr-settings-toggle-{id}" role="tabpanel" tabindex="-1">',
                                     '<ul>',
-                                    captionsMenuItem,
+                                        captionsMenuItem,
                                         '<li role="tab">',
                                             '<button type="button" class="plyr__control plyr__control--forward" id="plyr-settings-{id}-speed-toggle" aria-haspopup="true" aria-controls="plyr-settings-{id}-speed" aria-expanded="false">',
                                                 config.i18n.speed +
@@ -1042,11 +1056,9 @@
                                                 config.i18n.captions,
                                             '</button>',
                                         '</li>',
+                                        trackSubs,
                                         '<li>',
-                                            '<button type="button" class="plyr__control">English</button>',
-                                        '</li>',
-                                        '<li>',
-                                            '<button type="button" class="plyr__control">Off</button>',
+                                            '<button type="button" class="plyr__control" data-plyr="captions_menu">Off</button>',
                                         '</li>',
                                     '</ul>',
                                 '</div>',
@@ -1396,7 +1408,7 @@
             if (captionSources.length === 0) {
                 plyr.captionExists = false;
                 log('No caption track found');
-            } else if ((config.captions.selectedIndex + 1) > captionSources.length) {
+            } else if ((Number(config.captions.selectedIndex) + 1) > captionSources.length) {
                 plyr.captionExists = false;
                 log('Caption index out of bound');
             } else {
@@ -1728,7 +1740,7 @@
             html = replaceAll(html, '{speed}', getSpeedDisplayValue());
 
             // Replace current captions language
-            html = replaceAll(html, '{lang}', 'English');
+            html = replaceAll(html, '{lang}', getSubsLangValue());
 
             // Replace all id references with random numbers
             plyr.id = Math.floor(Math.random() * (10000));
@@ -1784,12 +1796,14 @@
                     settings: getElement(config.selectors.buttons.settings),
                     pip: getElement(config.selectors.buttons.pip),
                     speed: document.querySelectorAll(config.selectors.buttons.speed),
-                    loop: document.querySelectorAll(config.selectors.buttons.loop)
+                    loop: document.querySelectorAll(config.selectors.buttons.loop),
+                    captionslang: document.querySelectorAll(config.selectors.buttons.captionslang)
                 };
 
                 // Inputs
                 plyr.buttons.mute = getElement(config.selectors.buttons.mute);
                 plyr.buttons.captions = getElement(config.selectors.buttons.captions);
+                plyr.buttons.captions_menu = getElement(config.selectors.buttons.captions_menu);
 
                 // Progress
                 plyr.progress = {
@@ -2932,7 +2946,11 @@
             // Set global
             plyr.captionsEnabled = show;
 
-            // Toggle state
+            plyr.buttons.captions_menu.innerHTML = show ? 'Off' : 'On';
+            getElement('[data-captions="settings"]').innerHTML = getSubsLangValue();
+
+
+              // Toggle state
             toggleState(plyr.buttons.captions, plyr.captionsEnabled);
 
             // Add class hook
@@ -2951,12 +2969,25 @@
         function setCaptionIndex(index) {
             // Save active caption
             config.captions.selectedIndex = index;
-
+            getElement('[data-captions="settings"]').innerHTML = getSubsLangValue();
             // Clear caption
             setCaption();
 
             // Re-run setup
             setupCaptions();
+        }
+
+
+        function getSubsLangValue() {
+            if (config.tracks.length === 0) {
+                return;
+            }
+            
+            if (plyr.captionsEnabled || (plyr.captionsEnabled === undefined && plyr.storage.captionsEnabled)) {
+                return config.tracks[config.captions.selectedIndex].label;
+            } else {
+                return 'Disabled';
+            }
         }
 
         // Check if media is loading
@@ -3763,6 +3794,14 @@
 
             // Captions
             on(plyr.buttons.captions, 'click', toggleCaptions);
+            on(plyr.buttons.captions_menu, 'click', toggleCaptions);
+
+
+            // Captions language
+            proxy(plyr.buttons.captionslang, 'click', config.listeners.captionslang, function(e) {
+                var langIndex = e.target.attributes.getNamedItem("data-index").value;
+                setCaptionIndex(langIndex);
+            });
 
             // Settings
             on(plyr.buttons.settings, 'click', function(event) {
