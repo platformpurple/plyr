@@ -829,6 +829,19 @@
             };
         }
 
+        function buildCaptionsMenu() {
+            var trackSubs = '';
+            if (Array.isArray(config.tracks) && config.tracks.length > 0) {
+                for (var i in config.tracks) {
+                  var track = config.tracks[i];
+                  if (typeof track == 'function') continue;
+                  trackSubs += '<button type="button" class="plyr__control" data-plyr="captionslang" data-lang="'+track.srclang+'" data-index="'+i+'">'+track.label+'</button>';
+                }
+            }
+
+            return trackSubs;
+        }
+
         // Build the default HTML
         function buildControls() {
             // Create html array
@@ -996,7 +1009,6 @@
                 /* beautify ignore:start */
                 var captionsMenuItem = '';
                 var qualityMenuItem = '';
-                var trackSubs = '';
                 if (inArray(config.controls, 'captions')) {
                     captionsMenuItem = '<li role="tab">'+
                         '<button type="button" class="plyr__control plyr__control--forward" id="plyr-settings-{id}-captions-toggle" aria-haspopup="true" aria-controls="plyr-settings-{id}-captions" aria-expanded="false">'+
@@ -1013,14 +1025,6 @@
                             '<span class="plyr__menu__value">Auto</span>',
                         '</button>',
                     '</li>';
-                }
-
-                if (Array.isArray(config.tracks) && config.tracks.length > 0) {
-                    for (var i in config.tracks) {
-                        var track = config.tracks[i];
-                        trackSubs += '<li><button type="button" class="plyr__control" data-plyr="captionslang" data-lang="'+track.srclang+'" data-index="'+i+'">'+track.label+'</button></li>';
-                    }
-
                 }
 
                 html.push(
@@ -1056,7 +1060,9 @@
                                                 config.i18n.captions,
                                             '</button>',
                                         '</li>',
-                                        trackSubs,
+                                        '<li data-captions="langs">',
+                                            buildCaptionsMenu(),
+                                        '</li>',
                                         '<li>',
                                             '<button type="button" class="plyr__control" data-plyr="captions_menu">Off</button>',
                                         '</li>',
@@ -1399,9 +1405,17 @@
                 if (child.nodeName.toLowerCase() === 'track') {
                     if (child.kind === 'captions' || child.kind === 'subtitles') {
                         captionSources.push(child.getAttribute('src'));
+                        //TODO
+//                        var ele = {label: child.getAttribute('label'), srclang: child.getAttribute('srclang'), src: child.getAttribute('src'), kind: child.getAttribute('kind')};
+//                        config.tracks.pushIfNotExist(ele, function(e) {
+//                            return e.srclang === ele.srclang ;
+//                        });
+
                     }
                 }
             });
+//            getElement('[data-captions="langs"]').innerHTML = buildCaptionsMenu();
+
 
             // Record if caption file exists or not
             plyr.captionExists = true;
@@ -1521,7 +1535,20 @@
             }
         }
 
-        // Set the current caption
+      Array.prototype.inArray = function(comparer) {
+        for(var i=0; i < this.length; i++) {
+          if(comparer(this[i])) return true;
+        }
+        return false;
+      };
+
+      Array.prototype.pushIfNotExist = function(element, comparer) {
+        if (!this.inArray(comparer)) {
+          this.push(element);
+        }
+      };
+
+      // Set the current caption
         function setCaption(caption) {
             var captions = getElement(config.selectors.captions);
             var content = document.createElement('span');
@@ -1797,7 +1824,7 @@
                     pip: getElement(config.selectors.buttons.pip),
                     speed: document.querySelectorAll(config.selectors.buttons.speed),
                     loop: document.querySelectorAll(config.selectors.buttons.loop),
-                    captionslang: document.querySelectorAll(config.selectors.buttons.captionslang)
+                    captionslang: getElements(config.selectors.buttons.captionslang)
                 };
 
                 // Inputs
@@ -2968,22 +2995,23 @@
         // Select active caption
         function setCaptionIndex(index) {
             // Save active caption
-            config.captions.selectedIndex = index;
-            getElement('[data-captions="settings"]').innerHTML = getSubsLangValue();
+            config.captions.selectedIndex = index || config.captions.selectedIndex;
             // Clear caption
             setCaption();
 
             // Re-run setup
             setupCaptions();
+
+            getElement('[data-captions="settings"]').innerHTML = getSubsLangValue();
         }
 
 
         function getSubsLangValue() {
             if (config.tracks.length === 0) {
-                return;
+                return 'No Subs';
             }
-            
-            if (plyr.captionsEnabled || (plyr.captionsEnabled === undefined && plyr.storage.captionsEnabled)) {
+
+            if (plyr.captionsEnabled || !is.boolean(plyr.captionsEnabled) && plyr.storage.captionsEnabled) {
                 return config.tracks[config.captions.selectedIndex].label;
             } else {
                 return 'Disabled';
@@ -3448,6 +3476,7 @@
                 if (inArray(config.types.html5, plyr.type)) {
                     // Setup captions
                     if ('tracks' in source) {
+                        console.log(source.tracks,'source.tracks~~')
                         insertChildElements('track', source.tracks);
                     }
 
@@ -4229,6 +4258,7 @@
 
             // Captions
             setupCaptions();
+            setCaptionIndex();
 
             // Set volume
             setVolume();
