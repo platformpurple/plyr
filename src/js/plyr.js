@@ -41,7 +41,7 @@
                 enabled: false,
                 start: 0,
                 end: null,
-                inidicator: {
+                indicator: {
                     start: 0,
                     end: 0
                 }
