@@ -1640,7 +1640,7 @@
             toggleClass(plyr.container, config.classes.captions.enabled, true);
 
             // Try to load the value from storage
-            var active = plyr.storage.captionsEnabled;
+            var active = plyr.storage.captionsEnabled ? plyr.storage.captionsEnabled : false;//dont enable captions by default
 
             // Otherwise fall back to the default config
             if (!is.boolean(active)) {
