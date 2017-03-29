@@ -3703,7 +3703,6 @@
                     if (hasBindedKey) {
                         loopKeyBindings = defaults.loopKeyEvents;
                     }
-                    console.log(loopKeyBindings,'~~~loopKeyBindings')
 
                     switch (code) {
                         case loopKeyBindings.toggleLoop:
