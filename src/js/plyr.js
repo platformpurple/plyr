@@ -47,6 +47,11 @@
                 loopin:      73,
                 loopout:     79
             },
+            speedKeyEvents: {
+                resetSpeed: 187,
+                increaseSpeed: 221,
+                decreaseSpeed: 219
+            },
             seekTime: 10,
             volume: 10,
             volumeMin: 0,
@@ -3568,8 +3573,8 @@
                             allowed = [48, 49, 50, 51, 52, 53, 54, 56, 57, 75, 77, 70, 67],
                             count = get().length;
 
-                        //add also to allowed the keys of looping events
-                        allowed = allowed.concat(Object.values(config.loopKeyEvents));
+                        //add also to allowed the keys of looping events, speed events
+                        allowed = allowed.concat(Object.values(config.loopKeyEvents), Object.values(config.speedKeyEvents));
 
                         // Only handle global key press if there's only one player
                         // and the key is in the allowed keys
@@ -3617,8 +3622,9 @@
                     var preventDefault = [48, 49, 50, 51, 52, 53, 54, 56, 57, 32, 75, 38, 40, 77, 39, 37, 70, 67];
                     var checkFocus = [38, 40];
                     var loopKeyEventsValues = Object.values(config.loopKeyEvents);
+                    var speedKeyEventsValues = Object.values(config.speedKeyEvents);
 
-                    if (inArray(checkFocus, code) || inArray(loopKeyEventsValues, code)) {
+                    if (inArray(checkFocus, code) || inArray(loopKeyEventsValues, code) || inArray(speedKeyEventsValues, code)) {
                         var focused = getFocusElement();
 
                         if (is.htmlElement(focused) && getFocusElement().type === "radio") {
@@ -3717,6 +3723,26 @@
                         case loopKeyBindings.loopout:
                           toggleLoop('loopout');
                           break;
+                    }
+
+                    //Speed events
+                    var speedKeyBindings = config.speedKeyEvents;
+                    var currentSpeed = plyr.storage.speed;
+
+                    switch (code) {
+                      case speedKeyBindings.resetSpeed:
+                        setSpeed(config.defaultSpeed);
+                        break;
+                      case speedKeyBindings.increaseSpeed:
+                        if(currentSpeed != 2.0 ) {
+                            setSpeed( currentSpeed + 0.5 );
+                        }
+                        break;
+                      case speedKeyBindings.decreaseSpeed:
+                        if(currentSpeed != 0.5)  {
+                            setSpeed( currentSpeed - 0.5 );
+                        }
+                        break;
                     }
 
                     // Escape is handle natively when in full screen
