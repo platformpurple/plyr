@@ -2615,7 +2615,7 @@
             });
 
             //Update current value of menu
-            let el = document.querySelector('[data-menu="speed"]');
+            var el = document.querySelector('[data-menu="speed"]');
             if(el) el.innerHTML = getSpeedDisplayValue();
         }
 
@@ -2960,7 +2960,7 @@
             // Set global
             plyr.captionsEnabled = show;
             plyr.buttons.captions_menu.innerHTML = show ? 'Off' : 'On';
-            let el = getElement('[data-captions="settings"]');
+            var el = getElement('[data-captions="settings"]');
             if(el) el.innerHTML = getSubsLangValue();
 
             // Toggle state
@@ -2989,7 +2989,7 @@
             // Re-run setup
             setupCaptions();
 
-            let el = getElement('[data-captions="settings"]');
+            var el = getElement('[data-captions="settings"]');
             if(el) el.innerHTML = getSubsLangValue();
         }
 
