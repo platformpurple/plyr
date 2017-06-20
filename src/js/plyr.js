@@ -2615,7 +2615,8 @@
             });
 
             //Update current value of menu
-            document.querySelector('[data-menu="speed"]').innerHTML = getSpeedDisplayValue();
+            let el = document.querySelector('[data-menu="speed"]');
+            if(el) el.innerHTML = getSpeedDisplayValue();
         }
 
         // Rewind
