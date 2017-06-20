@@ -2959,7 +2959,8 @@
             // Set global
             plyr.captionsEnabled = show;
             plyr.buttons.captions_menu.innerHTML = show ? 'Off' : 'On';
-            getElement('[data-captions="settings"]').innerHTML = getSubsLangValue();
+            let el = getElement('[data-captions="settings"]');
+            if(el) el.innerHTML = getSubsLangValue();
 
             // Toggle state
             toggleState(plyr.buttons.captions, plyr.captionsEnabled);
@@ -2987,7 +2988,8 @@
             // Re-run setup
             setupCaptions();
 
-            getElement('[data-captions="settings"]').innerHTML = getSubsLangValue();
+            let el = getElement('[data-captions="settings"]');
+            if(el) el.innerHTML = getSubsLangValue();
         }
 
         function getSubsLangValue() {
