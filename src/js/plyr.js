@@ -2552,16 +2552,16 @@
 
             //check if can loop
             config.loop = is.number(config.loopin) && is.number(config.loopout);
-            var loopin = updateTimeDisplay(config.loopin, document.querySelector('[data-loop__value="loopin"]'));
-            var loopout = is.number(config.loopout) ? updateTimeDisplay(config.loopout + 2, document.querySelector('[data-loop__value="loopout"]')) : document.querySelector('[data-loop__value="loopout"]').innerHTML = '';
-            if (config.loop) {
-                document.querySelector('[data-menu="loop"]').innerHTML = loopin + ' - ' + loopout;
-            } else {
-                document.querySelector('[data-menu="loop"]').innerHTML = config.i18n.loopclear;
+            if(document.querySelector('[data-menu="loop"]')) {
+                var loopin = updateTimeDisplay(config.loopin, document.querySelector('[data-loop__value="loopin"]'));
+                var loopout = is.number(config.loopout) ? updateTimeDisplay(config.loopout + 2, document.querySelector('[data-loop__value="loopout"]')) : document.querySelector('[data-loop__value="loopout"]').innerHTML = '';
+                if (config.loop) {
+                    document.querySelector('[data-menu="loop"]').innerHTML = loopin + ' - ' + loopout;
+                } else {
+                    document.querySelector('[data-menu="loop"]').innerHTML = config.i18n.loopclear;
+                }
+            displayLoopBar();
             }
-
-          displayLoopBar();
-
         }
 
      function displayLoopBar() {
